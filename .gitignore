@@ -216,3 +216,23 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# ==============================
+# Project datasets
+# ==============================
+
+# Raw datasets
+data/raw/
+
+# Generated / processed datasets
+data/processed/
+
+# Local database files
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+
+# Trained model artifacts
+models/*.joblib
+models/*.pkl
