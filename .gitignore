@@ -236,3 +236,9 @@ database/*.sqlite3
 # Trained model artifacts
 models/*.joblib
 models/*.pkl
+
+# Local SQLite database files
+database/*.db
+database/*.db-journal
+database/*.sqlite
+database/*.sqlite3
