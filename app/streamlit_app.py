@@ -6,49 +6,190 @@ import streamlit as st
 
 
 # ============================================================
-# PROJECT ROOT
+# PROJECT PATH
 # ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(
-        0,
-        str(PROJECT_ROOT)
-    )
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 # ============================================================
 # PROJECT IMPORTS
 # ============================================================
 
-from src.database.reputation_service import (
-    scan_url,
-)
+from src.database.reputation_service import scan_url
 
 from src.database.db_manager import (
     initialize_database,
-    get_scan_history,
     get_database_stats,
+    get_scan_history,
 )
 
 
 # ============================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # ============================================================
 
 st.set_page_config(
-    page_title=
-        "Phishing URL Reputation System",
+    page_title="PhishGuard AI",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
-    page_icon=
-        "🛡️",
 
-    layout=
-        "wide",
+# ============================================================
+# CSS
+#
+# IMPORTANT:
+# This is the ONLY HTML used in the entire application.
+# There are NO custom <div> blocks anywhere in the UI.
+# ============================================================
 
-    initial_sidebar_state=
-        "expanded",
+st.markdown(
+    """
+<style>
+    .stApp {
+        background:
+            radial-gradient(
+                circle at 10% 0%,
+                rgba(37, 99, 235, 0.16),
+                transparent 28%
+            ),
+            linear-gradient(
+                180deg,
+                #07101d 0%,
+                #091321 50%,
+                #07101d 100%
+            );
+    }
+
+    .block-container {
+        max-width: 1250px;
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+    }
+
+    h1, h2, h3 {
+        color: #f8fbff !important;
+    }
+
+    p {
+        color: #a7b4c7;
+    }
+
+    [data-testid="stMetric"] {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(18, 31, 51, 0.95),
+                rgba(11, 21, 36, 0.95)
+            );
+
+        border:
+            1px solid rgba(255,255,255,0.08);
+
+        border-radius: 18px;
+
+        padding: 1rem 1.2rem;
+
+        box-shadow:
+            0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    [data-testid="stMetricLabel"] {
+        color: #8796ab;
+    }
+
+    [data-testid="stMetricValue"] {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    [data-testid="stTextInput"] input {
+        min-height: 50px;
+
+        color: #f8fbff !important;
+
+        background:
+            #0c1728 !important;
+
+        border-radius:
+            14px !important;
+    }
+
+    .stButton > button {
+        width: 100%;
+
+        min-height: 50px;
+
+        border-radius: 14px;
+
+        border: none;
+
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb,
+                #60a5fa
+            );
+
+        color: white;
+
+        font-weight: 800;
+
+        box-shadow:
+            0 12px 28px
+            rgba(37, 99, 235, 0.25);
+    }
+
+    .stButton > button:hover {
+        color: white;
+
+        border: none;
+
+        transform: translateY(-1px);
+    }
+
+    [data-testid="stDataFrame"] {
+        border:
+            1px solid rgba(255,255,255,0.08);
+
+        border-radius: 16px;
+
+        overflow: hidden;
+    }
+
+    [data-testid="stAlert"] {
+        border-radius: 16px;
+    }
+
+    div[data-testid="stExpander"] {
+        border:
+            1px solid rgba(255,255,255,0.07);
+
+        border-radius: 16px;
+
+        background:
+            rgba(15,26,43,0.55);
+    }
+
+    #MainMenu {
+        visibility: hidden;
+    }
+
+    footer {
+        visibility: hidden;
+    }
+
+    header {
+        background: transparent !important;
+    }
+</style>
+    """,
+    unsafe_allow_html=True,
 )
 
 
@@ -74,413 +215,563 @@ if "last_url" not in st.session_state:
 # HEADER
 # ============================================================
 
-st.title(
-    "🛡️ ML Phishing URL Reputation System"
+header_left, header_right = st.columns(
+    [5, 1]
 )
 
-st.caption(
-    "SQL-backed phishing detection using "
-    "deployment-safe URL features and "
-    "machine learning."
-)
+with header_left:
 
-st.divider()
-
-
-# ============================================================
-# SIDEBAR
-# ============================================================
-
-with st.sidebar:
-
-    st.header(
-        "System Information"
+    st.title(
+        "🛡️ PhishGuard AI"
     )
 
-    st.write(
-        "**ML Model:** "
-        "HistGradientBoosting"
+    st.caption(
+        "SQL-Backed Machine Learning URL Reputation System"
     )
 
-    st.write(
-        "**Decision Threshold:** "
-        "0.14"
-    )
 
-    st.write(
-        "**Features:** "
-        "22 URL-based features"
-    )
+with header_right:
 
-    st.write(
-        "**Database:** "
-        "SQLite"
-    )
-
-    st.write(
-        "**Detection Mode:** "
-        "URL-string analysis"
-    )
-
-    st.info(
-        "The system analyzes the URL "
-        "string itself and does not "
-        "automatically visit the website."
+    st.success(
+        "● System Online"
     )
 
 
 # ============================================================
-# DATABASE STATISTICS
+# HERO
+# ============================================================
+
+with st.container(
+    border=True
+):
+
+    st.subheader(
+        "Know before you click."
+    )
+
+    st.write(
+        """
+        Analyze suspicious URLs using machine learning and
+        SQL-backed reputation intelligence without opening
+        the submitted website.
+        """
+    )
+
+    tag1, tag2, tag3, tag4 = st.columns(
+        4
+    )
+
+    with tag1:
+
+        st.caption(
+            "🤖 HistGradientBoosting"
+        )
+
+    with tag2:
+
+        st.caption(
+            "🧬 22 URL Features"
+        )
+
+    with tag3:
+
+        st.caption(
+            "🗄️ SQL Reputation"
+        )
+
+    with tag4:
+
+        st.caption(
+            "🔒 No Site Visit"
+        )
+
+
+st.write("")
+
+
+# ============================================================
+# DATABASE OVERVIEW
 # ============================================================
 
 stats = get_database_stats()
 
-st.subheader(
-    "📊 Database Overview"
-)
-
-col1, col2, col3, col4 = st.columns(
+metric1, metric2, metric3, metric4 = st.columns(
     4
 )
 
-with col1:
+
+with metric1:
+
     st.metric(
-        "Unique URLs",
-        stats[
-            "total_urls"
-        ],
+        "URLs Analyzed",
+        stats["total_urls"],
     )
 
-with col2:
+
+with metric2:
+
     st.metric(
         "Total Scans",
-        stats[
-            "total_scans"
-        ],
+        stats["total_scans"],
     )
 
-with col3:
+
+with metric3:
+
     st.metric(
         "Verified URLs",
-        stats[
-            "verified_urls"
-        ],
+        stats["verified_urls"],
     )
 
-with col4:
+
+with metric4:
+
     st.metric(
-        "Phishing Results",
-        stats[
-            "phishing_results"
-        ],
+        "Threat Detections",
+        stats["phishing_results"],
     )
 
-st.divider()
+
+st.write("")
 
 
 # ============================================================
-# URL SCANNER
+# MAIN TABS
 # ============================================================
 
-st.subheader(
-    "🔍 Scan a URL"
-)
-
-url_input = st.text_input(
-    "Enter a URL",
-    placeholder=
-        "https://example.com/login",
-    value=
-        st.session_state.last_url,
-)
-
-
-scan_button = st.button(
-    "Scan URL",
-    type="primary",
-    use_container_width=True,
+scanner_tab, history_tab = st.tabs(
+    [
+        "🔍 URL Scanner",
+        "📊 History & System",
+    ]
 )
 
 
 # ============================================================
-# SCAN ACTION
+# URL SCANNER TAB
 # ============================================================
 
-if scan_button:
+with scanner_tab:
 
-    if not url_input.strip():
+    st.subheader(
+        "Scan a suspicious URL"
+    )
 
-        st.warning(
-            "Please enter a URL "
-            "before scanning."
+    st.caption(
+        """
+        Reputation data is checked first.
+        The ML classifier is used when no verified
+        reputation record is available.
+        """
+    )
+
+
+    # --------------------------------------------------------
+    # INPUT
+    # --------------------------------------------------------
+
+    input_column, button_column = st.columns(
+        [5, 1.4]
+    )
+
+
+    with input_column:
+
+        url_input = st.text_input(
+            "URL to analyze",
+            value=st.session_state.last_url,
+            placeholder=
+                "https://example.com/login",
+            label_visibility="collapsed",
         )
 
-    else:
 
-        try:
+    with button_column:
 
-            with st.spinner(
-                "Analyzing URL..."
-            ):
+        scan_button = st.button(
+            "Analyze URL",
+            type="primary",
+            use_container_width=True,
+        )
 
-                result = scan_url(
+
+    # --------------------------------------------------------
+    # SCAN ACTION
+    # --------------------------------------------------------
+
+    if scan_button:
+
+        if not url_input.strip():
+
+            st.warning(
+                "Please enter a URL before starting the analysis."
+            )
+
+        else:
+
+            try:
+
+                with st.spinner(
+                    "Analyzing URL reputation and phishing risk..."
+                ):
+
+                    result = scan_url(
+                        url_input
+                    )
+
+
+                st.session_state.last_result = (
+                    result
+                )
+
+                st.session_state.last_url = (
                     url_input
                 )
 
-            st.session_state.last_result = (
-                result
-            )
 
-            st.session_state.last_url = (
-                url_input
-            )
-            
-            st.rerun()
-
-        except Exception as error:
-
-            st.session_state.last_result = (
-                None
-            )
-
-            st.error(
-                f"Scan failed: {error}"
-            )
+                st.rerun()
 
 
-# ============================================================
-# DISPLAY SCAN RESULT
-# ============================================================
+            except Exception as error:
 
-result = st.session_state.last_result
+                st.session_state.last_result = (
+                    None
+                )
 
-if result is not None:
+                st.error(
+                    f"Analysis failed: {error}"
+                )
 
-    st.divider()
 
-    st.subheader(
-        "🧪 Scan Result"
-    )
+    # --------------------------------------------------------
+    # RESULT
+    # --------------------------------------------------------
 
-    label = result[
-        "label"
-    ]
+    result = st.session_state.last_result
 
-    if label == "Phishing":
 
-        st.error(
-            "🚨 PHISHING DETECTED"
+    if result is None:
+
+        st.info(
+            """
+            Enter a URL above to begin analysis.
+            The website will not be opened or visited.
+            """
         )
+
 
     else:
 
-        st.success(
-            "✅ LEGITIMATE"
+        st.divider()
+
+
+        label = result[
+            "label"
+        ]
+
+
+        verified = result.get(
+            "verified",
+            False
         )
 
-
-    result_col1, result_col2 = (
-        st.columns(
-            2
-        )
-    )
-
-
-    # ========================================================
-    # LEFT RESULT COLUMN
-    # ========================================================
-
-    with result_col1:
-
-        st.write(
-            "**Normalized URL**"
-        )
-
-        st.code(
-            result[
-                "normalized_url"
-            ]
-        )
-
-        st.write(
-            "**Hostname:**",
-            result[
-                "hostname"
-            ],
-        )
-
-        st.write(
-            "**Result Source:**",
-            result[
-                "source"
-            ],
-        )
-
-        st.write(
-            "**Verified Reputation:**",
-            "Yes"
-            if result[
-                "verified"
-            ]
-            else "No",
-        )
-
-
-    # ========================================================
-    # RIGHT RESULT COLUMN
-    # ========================================================
-
-    with result_col2:
-
-        probability = result.get(
-            "phishing_probability"
-        )
 
         risk_score = result.get(
             "risk_score"
         )
 
+
+        probability = result.get(
+            "phishing_probability"
+        )
+
+
         threshold = result.get(
             "threshold"
         )
+
 
         model = result.get(
             "model"
         )
 
 
-        if risk_score is not None:
+        # ----------------------------------------------------
+        # CLASSIFICATION
+        # ----------------------------------------------------
+
+        if label == "Phishing":
+
+            st.error(
+                "🚨 Potential Phishing Detected"
+            )
+
+            st.write(
+                """
+                The submitted URL crossed the phishing
+                decision threshold used by the detection system.
+                """
+            )
+
+
+        else:
+
+            st.success(
+                "✅ No Phishing Signal Detected"
+            )
+
+            st.write(
+                """
+                The submitted URL is currently classified
+                as legitimate by this detection system.
+                """
+            )
+
+
+        # ----------------------------------------------------
+        # RESULT METRICS
+        # ----------------------------------------------------
+
+        result1, result2, result3 = st.columns(
+            3
+        )
+
+
+        with result1:
 
             st.metric(
                 "Risk Score",
-                f"{risk_score:.2f}%"
+                (
+                    f"{risk_score:.2f}%"
+                    if risk_score is not None
+                    else "Verified"
+                ),
             )
 
 
-        if probability is not None:
+        with result2:
 
             st.metric(
                 "Phishing Probability",
-                f"{probability:.6f}"
+                (
+                    f"{probability:.4f}"
+                    if probability is not None
+                    else "N/A"
+                ),
             )
 
 
-        if threshold is not None:
+        with result3:
 
-            st.write(
-                "**Threshold:**",
-                threshold,
+            st.metric(
+                "Decision Source",
+                (
+                    "Verified Reputation"
+                    if verified
+                    else "ML Model"
+                ),
             )
 
 
-        if model is not None:
+        # ----------------------------------------------------
+        # RISK BAR
+        # ----------------------------------------------------
 
-            st.write(
-                "**Model:**",
-                model,
+        if risk_score is not None:
+
+            st.caption(
+                "Risk level"
             )
 
 
-    # ========================================================
-    # VERIFIED SOURCE DETAILS
-    # ========================================================
+            bounded_risk = max(
+                0,
+                min(
+                    int(round(risk_score)),
+                    100
+                )
+            )
 
-    if result[
-        "verified"
-    ]:
 
-        st.info(
-            "This result came from "
-            "verified reputation data."
+            st.progress(
+                bounded_risk
+            )
+
+
+        # ----------------------------------------------------
+        # URL DETAILS
+        # ----------------------------------------------------
+
+        st.subheader(
+            "Analysis Details"
         )
 
-        verification_source = (
-            result.get(
+
+        detail1, detail2 = st.columns(
+            2
+        )
+
+
+        with detail1:
+
+            st.caption(
+                "NORMALIZED URL"
+            )
+
+            st.code(
+                result[
+                    "normalized_url"
+                ],
+                language=None,
+            )
+
+
+        with detail2:
+
+            st.caption(
+                "HOSTNAME"
+            )
+
+            st.code(
+                result[
+                    "hostname"
+                ],
+                language=None,
+            )
+
+
+        detail3, detail4 = st.columns(
+            2
+        )
+
+
+        with detail3:
+
+            st.caption(
+                "DETECTION ENGINE"
+            )
+
+            st.write(
+                model
+                if model
+                else
+                "Verified Reputation Database"
+            )
+
+
+        with detail4:
+
+            st.caption(
+                "DECISION THRESHOLD"
+            )
+
+            st.write(
+                threshold
+                if threshold is not None
+                else
+                "Not applicable"
+            )
+
+
+        # ----------------------------------------------------
+        # VERIFIED RESULT
+        # ----------------------------------------------------
+
+        if verified:
+
+            st.info(
+                """
+                A verified reputation record was found.
+                The final decision was therefore returned
+                from the reputation database.
+                """
+            )
+
+
+            verification_source = result.get(
                 "verification_source"
             )
-        )
 
-        verification_notes = (
-            result.get(
+
+            verification_notes = result.get(
                 "verification_notes"
             )
-        )
 
-        if verification_source:
 
-            st.write(
-                "**Verification Source:**",
-                verification_source,
-            )
+            if verification_source:
 
-        if verification_notes:
+                st.write(
+                    "**Verification Source:**",
+                    verification_source,
+                )
 
-            st.write(
-                "**Verification Notes:**",
-                verification_notes,
-            )
 
-    else:
+            if verification_notes:
 
-        st.caption(
-            "This result was generated "
-            "by the ML model because no "
-            "verified reputation record "
-            "was available."
-        )
+                st.write(
+                    "**Verification Notes:**",
+                    verification_notes,
+                )
 
 
 # ============================================================
-# SCAN HISTORY
+# HISTORY TAB
 # ============================================================
 
-st.divider()
+with history_tab:
 
-st.subheader(
-    "🕘 Recent Scan History"
-)
-
-history = get_scan_history(
-    limit=20
-)
-
-if history:
-
-    history_df = pd.DataFrame(
-        history
+    st.subheader(
+        "Recent URL Analysis"
     )
 
-    history_columns = [
-        "scanned_at",
-        "normalized_url",
-        "final_label",
-        "result_source",
-        "risk_score",
-    ]
+    st.caption(
+        "Latest scans stored by the SQL reputation engine."
+    )
 
-    available_columns = [
-        column
-        for column in history_columns
-        if column in history_df.columns
-    ]
 
-    display_history = (
-        history_df[
-            available_columns
+    history = get_scan_history(
+        limit=15
+    )
+
+
+    if history:
+
+        history_df = pd.DataFrame(
+            history
+        )
+
+
+        wanted_columns = [
+            "scanned_at",
+            "normalized_url",
+            "final_label",
+            "result_source",
+            "risk_score",
         ]
-    )
 
-    display_history = (
-        display_history.rename(
+
+        available_columns = [
+            column
+            for column in wanted_columns
+            if column in history_df.columns
+        ]
+
+
+        history_df = history_df[
+            available_columns
+        ].copy()
+
+
+        history_df = history_df.rename(
             columns={
                 "scanned_at":
-                    "Scanned At",
+                    "Time",
 
                 "normalized_url":
                     "URL",
 
                 "final_label":
-                    "Result",
+                    "Classification",
 
                 "result_source":
                     "Source",
@@ -489,18 +780,250 @@ if history:
                     "Risk Score",
             }
         )
+
+
+        if "Source" in history_df.columns:
+
+            history_df[
+                "Source"
+            ] = (
+                history_df[
+                    "Source"
+                ]
+                .replace(
+                    {
+                        "ml_model":
+                            "ML Model",
+
+                        "verified_reputation":
+                            "Verified Reputation",
+                    }
+                )
+            )
+
+
+        if (
+            "Risk Score"
+            in history_df.columns
+        ):
+
+            history_df[
+                "Risk Score"
+            ] = (
+                history_df[
+                    "Risk Score"
+                ]
+                .apply(
+                    lambda value:
+                    (
+                        f"{value:.2f}%"
+                        if pd.notna(value)
+                        else "Verified"
+                    )
+                )
+            )
+
+
+        st.dataframe(
+            history_df,
+            use_container_width=True,
+            hide_index=True,
+        )
+
+
+    else:
+
+        st.info(
+            "No scan history has been recorded yet."
+        )
+
+
+    st.divider()
+
+
+    # --------------------------------------------------------
+    # SYSTEM INFORMATION
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Detection System"
     )
 
-    st.dataframe(
-        display_history,
-        use_container_width=True,
-        hide_index=True,
+
+    system1, system2 = st.columns(
+        2
     )
 
-else:
 
-    st.info(
-        "No scans have been recorded yet."
+    with system1:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "#### Machine Learning"
+            )
+
+            st.write(
+                "**Model:** HistGradientBoosting"
+            )
+
+            st.write(
+                "**Predictors:** 22 URL features"
+            )
+
+            st.write(
+                "**Threshold:** 0.14"
+            )
+
+            st.write(
+                "**Target:** Phishing / Legitimate"
+            )
+
+
+    with system2:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "#### Reputation Layer"
+            )
+
+            st.write(
+                "**Database:** SQLite"
+            )
+
+            st.write(
+                "**Stored:** Reputation + History"
+            )
+
+            st.write(
+                "**Verified overrides:** Supported"
+            )
+
+            st.write(
+                "**Website requests:** Disabled"
+            )
+
+
+    # --------------------------------------------------------
+    # HOW IT WORKS
+    # --------------------------------------------------------
+
+    st.subheader(
+        "How the analysis works"
+    )
+
+
+    workflow1, workflow2, workflow3, workflow4 = st.columns(
+        4
+    )
+
+
+    with workflow1:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "### 01"
+            )
+
+            st.markdown(
+                "**Normalize**"
+            )
+
+            st.caption(
+                "Validate and normalize the submitted URL."
+            )
+
+
+    with workflow2:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "### 02"
+            )
+
+            st.markdown(
+                "**Reputation**"
+            )
+
+            st.caption(
+                "Check SQL for trusted existing reputation."
+            )
+
+
+    with workflow3:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "### 03"
+            )
+
+            st.markdown(
+                "**ML Analysis**"
+            )
+
+            st.caption(
+                "Generate features and estimate phishing risk."
+            )
+
+
+    with workflow4:
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                "### 04"
+            )
+
+            st.markdown(
+                "**Store**"
+            )
+
+            st.caption(
+                "Update reputation and record scan history."
+            )
+
+
+# ============================================================
+# RESPONSIBLE USE
+# ============================================================
+
+st.write("")
+
+
+with st.expander(
+    "ℹ️ About PhishGuard AI"
+):
+
+    st.write(
+        """
+        PhishGuard AI performs lexical URL analysis using
+        a trained machine-learning classifier and a SQL-backed
+        reputation layer.
+
+        Submitted websites are not automatically opened or
+        visited.
+
+        Machine-learning security systems can still produce
+        false positives or false negatives, so results should
+        be treated as security guidance rather than an
+        absolute guarantee.
+        """
     )
 
 
@@ -511,6 +1034,5 @@ else:
 st.divider()
 
 st.caption(
-    "ML Phishing URL Reputation System | "
-    "Final Year Project"
+    "PhishGuard AI • Python • scikit-learn • SQLite • Streamlit"
 )
