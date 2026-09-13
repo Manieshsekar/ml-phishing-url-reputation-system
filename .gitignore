@@ -242,3 +242,13 @@ database/*.db
 database/*.db-journal
 database/*.sqlite
 database/*.sqlite3
+
+# ------------------------------------------------------------
+# Deployment artifacts required by Streamlit Community Cloud
+# ------------------------------------------------------------
+
+!models/final_phishing_model.joblib
+
+!data/processed/
+data/processed/*
+!data/processed/final_model_metadata.json

@@ -1,0 +1,44 @@
+{
+    "model_name": "HistGradientBoosting",
+    "decision_threshold": 0.14,
+    "feature_count": 22,
+    "features": [
+        "url_length",
+        "domain_length",
+        "path_length",
+        "query_length",
+        "dot_count",
+        "hyphen_count",
+        "underscore_count",
+        "slash_count",
+        "question_count",
+        "equal_count",
+        "ampersand_count",
+        "at_count",
+        "percent_count",
+        "digit_count",
+        "letter_count",
+        "digit_ratio",
+        "letter_ratio",
+        "is_https",
+        "is_domain_ip",
+        "subdomain_count",
+        "suspicious_word_count",
+        "url_entropy"
+    ],
+    "target_name": "is_phishing",
+    "target_mapping": {
+        "0": "legitimate",
+        "1": "phishing"
+    },
+    "training_strategy": "Exact URL deduplication; 70/15/15 stratified split; model and threshold selected using validation and hostname-disjoint holdout; final model retrained on train+validation.",
+    "test_metrics": {
+        "Accuracy": 0.9942502690760777,
+        "Precision": 0.9931702141767788,
+        "Recall": 0.9933678206658708,
+        "F1": 0.99326900759309,
+        "F2": 0.9933282930776067,
+        "ROC_AUC": 0.9982173280314719,
+        "PR_AUC": 0.99862212567385
+    }
+}
